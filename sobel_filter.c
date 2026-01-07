@@ -134,6 +134,198 @@ void apply_sobel_7(const unsigned char* source_image, unsigned char* destination
     }
 }
 
+void apply_advance_sobel_0(const unsigned char* source_image, int width, int height, unsigned char* destination_image){
+    int Gx[3][3] = {{-1,-2,-1},
+                    { 0, 0, 0},
+                    { 1, 2, 1}};
+
+    int Gy[3][3] = {{ 1,  0, -1},
+                    { 2,  0, -2},
+                    { 1,  0, -1}};
+
+    for(int row = 1; row < height - 1; ++row){
+        for(int col = 1; col < width - 1; ++col){
+            int gx = Gx[0][0] * source_image[(row - 1) * width + col - 1] + Gx[0][1] * source_image[(row - 1) * width + col + 0] + Gx[0][2] * source_image[(row - 1) * width + col + 1] +
+                     Gx[1][0] * source_image[(row + 0) * width + col - 1] + Gx[1][1] * source_image[(row + 0) * width + col + 0] + Gx[1][2] * source_image[(row + 0) * width + col + 1] +
+                     Gx[2][0] * source_image[(row + 1) * width + col - 1] + Gx[2][1] * source_image[(row + 1) * width + col + 0] + Gx[2][2] * source_image[(row + 1) * width + col + 1] ;
+            
+            int gy = Gy[0][0] * source_image[(row - 1) * width + col - 1] + Gy[0][1] * source_image[(row - 1) * width + col + 0] + Gy[0][2] * source_image[(row - 1) * width + col + 1] +
+                     Gy[1][0] * source_image[(row + 0) * width + col - 1] + Gy[1][1] * source_image[(row + 0) * width + col + 0] + Gy[1][2] * source_image[(row + 0) * width + col + 1] +
+                     Gy[2][0] * source_image[(row + 1) * width + col - 1] + Gy[2][1] * source_image[(row + 1) * width + col + 0] + Gy[2][2] * source_image[(row + 1) * width + col + 1] ;
+
+            destination_image[row * width + col] = sqrt(gx * gx + gy * gy);
+        }
+    }
+}
+
+void apply_advance_sobel_1(const unsigned char* source_image, int width, int height, unsigned char* destination_image){
+    int Gx[3][3] = {{-2,-1, 0},
+                    {-1, 0, 1},
+                    { 0, 1, 2}};
+
+    int Gy[3][3] = {{ 0, -1, -2},
+                    { 1,  0, -1},
+                    { 2,  1,  0}};
+
+    for(int row = 1; row < height - 1; ++row){
+        for(int col = 1; col < width - 1; ++col){
+            int gx = Gx[0][0] * source_image[(row - 1) * width + col - 1] + Gx[0][1] * source_image[(row - 1) * width + col + 0] + Gx[0][2] * source_image[(row - 1) * width + col + 1] +
+                     Gx[1][0] * source_image[(row + 0) * width + col - 1] + Gx[1][1] * source_image[(row + 0) * width + col + 0] + Gx[1][2] * source_image[(row + 0) * width + col + 1] +
+                     Gx[2][0] * source_image[(row + 1) * width + col - 1] + Gx[2][1] * source_image[(row + 1) * width + col + 0] + Gx[2][2] * source_image[(row + 1) * width + col + 1] ;
+            
+            int gy = Gy[0][0] * source_image[(row - 1) * width + col - 1] + Gy[0][1] * source_image[(row - 1) * width + col + 0] + Gy[0][2] * source_image[(row - 1) * width + col + 1] +
+                     Gy[1][0] * source_image[(row + 0) * width + col - 1] + Gy[1][1] * source_image[(row + 0) * width + col + 0] + Gy[1][2] * source_image[(row + 0) * width + col + 1] +
+                     Gy[2][0] * source_image[(row + 1) * width + col - 1] + Gy[2][1] * source_image[(row + 1) * width + col + 0] + Gy[2][2] * source_image[(row + 1) * width + col + 1] ;
+
+            destination_image[row * width + col] = sqrt(gx * gx + gy * gy);
+        }
+    }
+}
+
+void apply_advance_sobel_2(const unsigned char* source_image, int width, int height, unsigned char* destination_image){
+    int Gx[3][3] = {{-1, 0, 1},
+                    {-2, 0, 2},
+                    {-1, 0, 1}};
+
+    int Gy[3][3] = {{-1, -2, -1},
+                    { 0,  0,  0},
+                    { 1,  2,  1}};
+
+    for(int row = 1; row < height - 1; ++row){
+        for(int col = 1; col < width - 1; ++col){
+            int gx = Gx[0][0] * source_image[(row - 1) * width + col - 1] + Gx[0][1] * source_image[(row - 1) * width + col + 0] + Gx[0][2] * source_image[(row - 1) * width + col + 1] +
+                     Gx[1][0] * source_image[(row + 0) * width + col - 1] + Gx[1][1] * source_image[(row + 0) * width + col + 0] + Gx[1][2] * source_image[(row + 0) * width + col + 1] +
+                     Gx[2][0] * source_image[(row + 1) * width + col - 1] + Gx[2][1] * source_image[(row + 1) * width + col + 0] + Gx[2][2] * source_image[(row + 1) * width + col + 1] ;
+            
+            int gy = Gy[0][0] * source_image[(row - 1) * width + col - 1] + Gy[0][1] * source_image[(row - 1) * width + col + 0] + Gy[0][2] * source_image[(row - 1) * width + col + 1] +
+                     Gy[1][0] * source_image[(row + 0) * width + col - 1] + Gy[1][1] * source_image[(row + 0) * width + col + 0] + Gy[1][2] * source_image[(row + 0) * width + col + 1] +
+                     Gy[2][0] * source_image[(row + 1) * width + col - 1] + Gy[2][1] * source_image[(row + 1) * width + col + 0] + Gy[2][2] * source_image[(row + 1) * width + col + 1] ;
+
+            destination_image[row * width + col] = sqrt(gx * gx + gy * gy);
+        }
+    }
+}
+
+void apply_advance_sobel_3(const unsigned char* source_image, int width, int height, unsigned char* destination_image){
+    int Gx[3][3] = {{ 0, 1, 2},
+                    {-1, 0, 1},
+                    {-2,-1, 0}};
+
+    int Gy[3][3] = {{-2, -1, 0},
+                    {-1,  0, 1},
+                    { 0,  1, 2}};
+
+    for(int row = 1; row < height - 1; ++row){
+        for(int col = 1; col < width - 1; ++col){
+            int gx = Gx[0][0] * source_image[(row - 1) * width + col - 1] + Gx[0][1] * source_image[(row - 1) * width + col + 0] + Gx[0][2] * source_image[(row - 1) * width + col + 1] +
+                     Gx[1][0] * source_image[(row + 0) * width + col - 1] + Gx[1][1] * source_image[(row + 0) * width + col + 0] + Gx[1][2] * source_image[(row + 0) * width + col + 1] +
+                     Gx[2][0] * source_image[(row + 1) * width + col - 1] + Gx[2][1] * source_image[(row + 1) * width + col + 0] + Gx[2][2] * source_image[(row + 1) * width + col + 1] ;
+            
+            int gy = Gy[0][0] * source_image[(row - 1) * width + col - 1] + Gy[0][1] * source_image[(row - 1) * width + col + 0] + Gy[0][2] * source_image[(row - 1) * width + col + 1] +
+                     Gy[1][0] * source_image[(row + 0) * width + col - 1] + Gy[1][1] * source_image[(row + 0) * width + col + 0] + Gy[1][2] * source_image[(row + 0) * width + col + 1] +
+                     Gy[2][0] * source_image[(row + 1) * width + col - 1] + Gy[2][1] * source_image[(row + 1) * width + col + 0] + Gy[2][2] * source_image[(row + 1) * width + col + 1] ;
+
+            destination_image[row * width + col] = sqrt(gx * gx + gy * gy);
+        }
+    }
+}
+
+void apply_advance_sobel_4(const unsigned char* source_image, int width, int height, unsigned char* destination_image){
+    int Gx[3][3] = {{ 1, 2, 1},
+                    { 0, 0, 0},
+                    {-1,-2,-1}};
+
+    int Gy[3][3] = {{-1,  0, 1},
+                    {-2,  0, 2},
+                    {-1,  0, 1}};
+
+    for(int row = 1; row < height - 1; ++row){
+        for(int col = 1; col < width - 1; ++col){
+            int gx = Gx[0][0] * source_image[(row - 1) * width + col - 1] + Gx[0][1] * source_image[(row - 1) * width + col + 0] + Gx[0][2] * source_image[(row - 1) * width + col + 1] +
+                     Gx[1][0] * source_image[(row + 0) * width + col - 1] + Gx[1][1] * source_image[(row + 0) * width + col + 0] + Gx[1][2] * source_image[(row + 0) * width + col + 1] +
+                     Gx[2][0] * source_image[(row + 1) * width + col - 1] + Gx[2][1] * source_image[(row + 1) * width + col + 0] + Gx[2][2] * source_image[(row + 1) * width + col + 1] ;
+            
+            int gy = Gy[0][0] * source_image[(row - 1) * width + col - 1] + Gy[0][1] * source_image[(row - 1) * width + col + 0] + Gy[0][2] * source_image[(row - 1) * width + col + 1] +
+                     Gy[1][0] * source_image[(row + 0) * width + col - 1] + Gy[1][1] * source_image[(row + 0) * width + col + 0] + Gy[1][2] * source_image[(row + 0) * width + col + 1] +
+                     Gy[2][0] * source_image[(row + 1) * width + col - 1] + Gy[2][1] * source_image[(row + 1) * width + col + 0] + Gy[2][2] * source_image[(row + 1) * width + col + 1] ;
+
+            destination_image[row * width + col] = sqrt(gx * gx + gy * gy);
+        }
+    }
+}
+
+void apply_advance_sobel_5(const unsigned char* source_image, int width, int height, unsigned char* destination_image){
+    int Gx[3][3] = {{ 2, 1, 0},
+                    { 1, 0,-1},
+                    { 0,-1,-2}};
+
+    int Gy[3][3] = {{ 0,  1, 2},
+                    {-1,  0, 1},
+                    {-2, -1, 0}};
+
+    for(int row = 1; row < height - 1; ++row){
+        for(int col = 1; col < width - 1; ++col){
+            int gx = Gx[0][0] * source_image[(row - 1) * width + col - 1] + Gx[0][1] * source_image[(row - 1) * width + col + 0] + Gx[0][2] * source_image[(row - 1) * width + col + 1] +
+                     Gx[1][0] * source_image[(row + 0) * width + col - 1] + Gx[1][1] * source_image[(row + 0) * width + col + 0] + Gx[1][2] * source_image[(row + 0) * width + col + 1] +
+                     Gx[2][0] * source_image[(row + 1) * width + col - 1] + Gx[2][1] * source_image[(row + 1) * width + col + 0] + Gx[2][2] * source_image[(row + 1) * width + col + 1] ;
+            
+            int gy = Gy[0][0] * source_image[(row - 1) * width + col - 1] + Gy[0][1] * source_image[(row - 1) * width + col + 0] + Gy[0][2] * source_image[(row - 1) * width + col + 1] +
+                     Gy[1][0] * source_image[(row + 0) * width + col - 1] + Gy[1][1] * source_image[(row + 0) * width + col + 0] + Gy[1][2] * source_image[(row + 0) * width + col + 1] +
+                     Gy[2][0] * source_image[(row + 1) * width + col - 1] + Gy[2][1] * source_image[(row + 1) * width + col + 0] + Gy[2][2] * source_image[(row + 1) * width + col + 1] ;
+
+            destination_image[row * width + col] = sqrt(gx * gx + gy * gy);
+        }
+    }
+}
+
+void apply_advance_sobel_6(const unsigned char* source_image, int width, int height, unsigned char* destination_image){
+    int Gx[3][3] = {{ 1, 0,-1},
+                    { 2, 0,-2},
+                    { 1, 0,-1}};
+
+    int Gy[3][3] = {{ 1,  2, 1},
+                    { 0,  0, 0},
+                    {-1, -2,-1}};
+
+    for(int row = 1; row < height - 1; ++row){
+        for(int col = 1; col < width - 1; ++col){
+            int gx = Gx[0][0] * source_image[(row - 1) * width + col - 1] + Gx[0][1] * source_image[(row - 1) * width + col + 0] + Gx[0][2] * source_image[(row - 1) * width + col + 1] +
+                     Gx[1][0] * source_image[(row + 0) * width + col - 1] + Gx[1][1] * source_image[(row + 0) * width + col + 0] + Gx[1][2] * source_image[(row + 0) * width + col + 1] +
+                     Gx[2][0] * source_image[(row + 1) * width + col - 1] + Gx[2][1] * source_image[(row + 1) * width + col + 0] + Gx[2][2] * source_image[(row + 1) * width + col + 1] ;
+            
+            int gy = Gy[0][0] * source_image[(row - 1) * width + col - 1] + Gy[0][1] * source_image[(row - 1) * width + col + 0] + Gy[0][2] * source_image[(row - 1) * width + col + 1] +
+                     Gy[1][0] * source_image[(row + 0) * width + col - 1] + Gy[1][1] * source_image[(row + 0) * width + col + 0] + Gy[1][2] * source_image[(row + 0) * width + col + 1] +
+                     Gy[2][0] * source_image[(row + 1) * width + col - 1] + Gy[2][1] * source_image[(row + 1) * width + col + 0] + Gy[2][2] * source_image[(row + 1) * width + col + 1] ;
+
+            destination_image[row * width + col] = sqrt(gx * gx + gy * gy);
+        }
+    }
+}
+
+void apply_advance_sobel_7(const unsigned char* source_image, int width, int height, unsigned char* destination_image){
+    int Gx[3][3] = {{ 0,-1,-2},
+                    { 1, 0,-1},
+                    { 2, 1, 0}};
+
+    int Gy[3][3] = {{ 2,  1, 0},
+                    { 1,  0,-1},
+                    { 0, -1,-2}};
+
+    for(int row = 1; row < height - 1; ++row){
+        for(int col = 1; col < width - 1; ++col){
+            int gx = Gx[0][0] * source_image[(row - 1) * width + col - 1] + Gx[0][1] * source_image[(row - 1) * width + col + 0] + Gx[0][2] * source_image[(row - 1) * width + col + 1] +
+                     Gx[1][0] * source_image[(row + 0) * width + col - 1] + Gx[1][1] * source_image[(row + 0) * width + col + 0] + Gx[1][2] * source_image[(row + 0) * width + col + 1] +
+                     Gx[2][0] * source_image[(row + 1) * width + col - 1] + Gx[2][1] * source_image[(row + 1) * width + col + 0] + Gx[2][2] * source_image[(row + 1) * width + col + 1] ;
+            
+            int gy = Gy[0][0] * source_image[(row - 1) * width + col - 1] + Gy[0][1] * source_image[(row - 1) * width + col + 0] + Gy[0][2] * source_image[(row - 1) * width + col + 1] +
+                     Gy[1][0] * source_image[(row + 0) * width + col - 1] + Gy[1][1] * source_image[(row + 0) * width + col + 0] + Gy[1][2] * source_image[(row + 0) * width + col + 1] +
+                     Gy[2][0] * source_image[(row + 1) * width + col - 1] + Gy[2][1] * source_image[(row + 1) * width + col + 0] + Gy[2][2] * source_image[(row + 1) * width + col + 1] ;
+
+            destination_image[row * width + col] = sqrt(gx * gx + gy * gy);
+        }
+    }
+}
+
 int main(int argc, char** argv){
     if(argc != 2){
         fprintf(stderr, "Only One Argument Allowed : code.exe image.png\n");
@@ -174,7 +366,25 @@ int main(int argc, char** argv){
     unsigned char* white_sobel_6_image = malloc((size_t)sWidth * sHeight * 1);
     unsigned char* white_sobel_7_image = malloc((size_t)sWidth * sHeight * 1);
 
-    if(black_image == NULL || black_sobel_0_image == NULL || black_sobel_1_image == NULL || black_sobel_2_image == NULL || black_sobel_3_image == NULL || black_sobel_4_image == NULL || black_sobel_5_image == NULL || black_sobel_6_image == NULL || black_sobel_7_image == NULL || white_image == NULL || white_sobel_0_image == NULL || white_sobel_1_image == NULL || white_sobel_2_image == NULL || white_sobel_3_image == NULL || white_sobel_4_image == NULL || white_sobel_5_image == NULL || white_sobel_6_image == NULL || white_sobel_7_image == NULL){
+    unsigned char* advance_black_sobel_0_image = malloc((size_t)sWidth * sHeight * 1);
+    unsigned char* advance_black_sobel_1_image = malloc((size_t)sWidth * sHeight * 1);
+    unsigned char* advance_black_sobel_2_image = malloc((size_t)sWidth * sHeight * 1);
+    unsigned char* advance_black_sobel_3_image = malloc((size_t)sWidth * sHeight * 1);
+    unsigned char* advance_black_sobel_4_image = malloc((size_t)sWidth * sHeight * 1);
+    unsigned char* advance_black_sobel_5_image = malloc((size_t)sWidth * sHeight * 1);
+    unsigned char* advance_black_sobel_6_image = malloc((size_t)sWidth * sHeight * 1);
+    unsigned char* advance_black_sobel_7_image = malloc((size_t)sWidth * sHeight * 1);
+
+    unsigned char* advance_white_sobel_0_image = malloc((size_t)sWidth * sHeight * 1);
+    unsigned char* advance_white_sobel_1_image = malloc((size_t)sWidth * sHeight * 1);
+    unsigned char* advance_white_sobel_2_image = malloc((size_t)sWidth * sHeight * 1);
+    unsigned char* advance_white_sobel_3_image = malloc((size_t)sWidth * sHeight * 1);
+    unsigned char* advance_white_sobel_4_image = malloc((size_t)sWidth * sHeight * 1);
+    unsigned char* advance_white_sobel_5_image = malloc((size_t)sWidth * sHeight * 1);
+    unsigned char* advance_white_sobel_6_image = malloc((size_t)sWidth * sHeight * 1);
+    unsigned char* advance_white_sobel_7_image = malloc((size_t)sWidth * sHeight * 1);
+
+    if(black_image == NULL || black_sobel_0_image == NULL || black_sobel_1_image == NULL || black_sobel_2_image == NULL || black_sobel_3_image == NULL || black_sobel_4_image == NULL || black_sobel_5_image == NULL || black_sobel_6_image == NULL || black_sobel_7_image == NULL || white_image == NULL || white_sobel_0_image == NULL || white_sobel_1_image == NULL || white_sobel_2_image == NULL || white_sobel_3_image == NULL || white_sobel_4_image == NULL || white_sobel_5_image == NULL || white_sobel_6_image == NULL || white_sobel_7_image == NULL || advance_black_sobel_0_image == NULL || advance_black_sobel_1_image == NULL || advance_black_sobel_2_image == NULL || advance_black_sobel_3_image == NULL || advance_black_sobel_4_image == NULL || advance_black_sobel_5_image == NULL || advance_black_sobel_6_image == NULL || advance_black_sobel_7_image == NULL || advance_white_sobel_0_image == NULL || advance_white_sobel_1_image == NULL || advance_white_sobel_2_image == NULL || advance_white_sobel_3_image == NULL || advance_white_sobel_4_image == NULL || advance_white_sobel_5_image == NULL || advance_white_sobel_6_image == NULL || advance_white_sobel_7_image == NULL){
         fprintf(stderr, "Error Memory Allocation\n");
         stbi_image_free(free);
         return 1;
@@ -218,6 +428,42 @@ int main(int argc, char** argv){
     apply_sobel_7(white_image, white_sobel_7_image, sWidth, sHeight);
     stbi_write_png("17 white_sobel7.png", sWidth, sHeight, 1, white_sobel_7_image, sWidth * 1);
 
+    apply_advance_sobel_0(black_image, sWidth, sHeight, advance_black_sobel_0_image);
+    stbi_write_png("18 advance_black_sobel0.png", sWidth, sHeight, 1, advance_black_sobel_0_image, sWidth * 1);
+    apply_advance_sobel_1(black_image, sWidth, sHeight, advance_black_sobel_1_image);
+    stbi_write_png("19 advance_black_sobel1.png", sWidth, sHeight, 1, advance_black_sobel_1_image, sWidth * 1);
+    apply_advance_sobel_2(black_image, sWidth, sHeight, advance_black_sobel_2_image);
+    stbi_write_png("20 advance_black_sobel2.png", sWidth, sHeight, 1, advance_black_sobel_2_image, sWidth * 1);
+    apply_advance_sobel_3(black_image, sWidth, sHeight, advance_black_sobel_3_image);
+    stbi_write_png("21 advance_black_sobel3.png", sWidth, sHeight, 1, advance_black_sobel_3_image, sWidth * 1);
+    apply_advance_sobel_4(black_image, sWidth, sHeight, advance_black_sobel_4_image);
+    stbi_write_png("22 advance_black_sobel4.png", sWidth, sHeight, 1, advance_black_sobel_4_image, sWidth * 1);
+    apply_advance_sobel_5(black_image, sWidth, sHeight, advance_black_sobel_5_image);
+    stbi_write_png("23 advance_black_sobel5.png", sWidth, sHeight, 1, advance_black_sobel_5_image, sWidth * 1);
+    apply_advance_sobel_6(black_image, sWidth, sHeight, advance_black_sobel_6_image);
+    stbi_write_png("24 advance_black_sobel6.png", sWidth, sHeight, 1, advance_black_sobel_6_image, sWidth * 1);
+    apply_advance_sobel_7(black_image, sWidth, sHeight, advance_black_sobel_7_image);
+    stbi_write_png("25 advance_black_sobel7.png", sWidth, sHeight, 1, advance_black_sobel_7_image, sWidth * 1);
+
+    apply_advance_sobel_0(white_image, sWidth, sHeight, advance_white_sobel_0_image);
+    stbi_write_png("26 advance_white_sobel0.png", sWidth, sHeight, 1, advance_white_sobel_0_image, sWidth * 1);
+    apply_advance_sobel_1(white_image, sWidth, sHeight, advance_white_sobel_1_image);
+    stbi_write_png("27 advance_white_sobel1.png", sWidth, sHeight, 1, advance_white_sobel_1_image, sWidth * 1);
+    apply_advance_sobel_2(white_image, sWidth, sHeight, advance_white_sobel_2_image);
+    stbi_write_png("28 advance_white_sobel2.png", sWidth, sHeight, 1, advance_white_sobel_2_image, sWidth * 1);
+    apply_advance_sobel_3(white_image, sWidth, sHeight, advance_white_sobel_3_image);
+    stbi_write_png("29 advance_white_sobel3.png", sWidth, sHeight, 1, advance_white_sobel_3_image, sWidth * 1);
+    apply_advance_sobel_4(white_image, sWidth, sHeight, advance_white_sobel_4_image);
+    stbi_write_png("30 advance_white_sobel4.png", sWidth, sHeight, 1, advance_white_sobel_4_image, sWidth * 1);
+    apply_advance_sobel_5(white_image, sWidth, sHeight, advance_white_sobel_5_image);
+    stbi_write_png("31 advance_white_sobel5.png", sWidth, sHeight, 1, advance_white_sobel_5_image, sWidth * 1);
+    apply_advance_sobel_6(white_image, sWidth, sHeight, advance_white_sobel_6_image);
+    stbi_write_png("32 advance_white_sobel6.png", sWidth, sHeight, 1, advance_white_sobel_6_image, sWidth * 1);
+    apply_advance_sobel_7(white_image, sWidth, sHeight, advance_white_sobel_7_image);
+    stbi_write_png("33 advance_white_sobel7.png", sWidth, sHeight, 1, advance_white_sobel_7_image, sWidth * 1);
+
+
+
     stbi_image_free(source_image);
     free(black_image);
     free(black_sobel_0_image);
@@ -228,6 +474,7 @@ int main(int argc, char** argv){
     free(black_sobel_5_image);
     free(black_sobel_6_image);
     free(black_sobel_7_image);
+
     free(white_image);
     free(white_sobel_0_image);
     free(white_sobel_1_image);
@@ -237,6 +484,24 @@ int main(int argc, char** argv){
     free(white_sobel_5_image);
     free(white_sobel_6_image);
     free(white_sobel_7_image);
+
+    free(advance_black_sobel_0_image);
+    free(advance_black_sobel_1_image);
+    free(advance_black_sobel_2_image);
+    free(advance_black_sobel_3_image);
+    free(advance_black_sobel_4_image);
+    free(advance_black_sobel_5_image);
+    free(advance_black_sobel_6_image);
+    free(advance_black_sobel_7_image);
+
+    free(advance_white_sobel_0_image);
+    free(advance_white_sobel_1_image);
+    free(advance_white_sobel_2_image);
+    free(advance_white_sobel_3_image);
+    free(advance_white_sobel_4_image);
+    free(advance_white_sobel_5_image);
+    free(advance_white_sobel_6_image);
+    free(advance_white_sobel_7_image);
     
     return 0;
 }

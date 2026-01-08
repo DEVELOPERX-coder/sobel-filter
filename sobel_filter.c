@@ -5,7 +5,8 @@
 
 #include <stdio.h>
 
-void convert_black_white(const unsigned char* source_image, int width, int height, int channels, unsigned char* destination_image){
+// Convert a RGB image to Black and White ( 24bits -> 8bits )
+void convert_black_white(const unsigned char* source_image, int width, int height, unsigned char* destination_image){
     int index = -1;
     for(int row = 0; row < height; ++row){
         for(int col = 0; col < width; ++col){
@@ -14,12 +15,20 @@ void convert_black_white(const unsigned char* source_image, int width, int heigh
     }
 }
 
+// Inverse Black And White Image Colors
 void inverse_black(const unsigned char* source_image, int width, int height, unsigned char* destination_image){
     for(int row = 0; row < height; ++row){
         for(int col = 0; col < width; ++col){
             destination_image[row * width + col] = 255 - source_image[row * width + col];
         }
     }
+}
+
+// Apply Sobel Filter and return single int value
+int sobel_calculations(const int** filter, const unsigned char* image, int row, int width, int col){
+    return filter[0][0] * image[(row - 1) * width + col - 1] + filter[0][1] * image[(row - 1) * width + col + 0] + filter[0][2] * image[(row - 1) * width + col + 1]
+         + filter[1][0] * image[(row + 0) * width + col - 1] + filter[1][1] * image[(row + 0) * width + col + 0] + filter[1][2] * image[(row + 0) * width + col + 1]
+         + filter[2][0] * image[(row + 1) * width + col - 1] + filter[2][1] * image[(row + 1) * width + col + 0] + filter[2][2] * image[(row + 1) * width + col + 1];
 }
 
 void apply_sobel_0(const unsigned char* source_image, unsigned char* destination_image, int width, int height){
@@ -29,6 +38,7 @@ void apply_sobel_0(const unsigned char* source_image, unsigned char* destination
 
     for(int row = 1; row < height - 1; ++row){
         for(int col = 1; col < width - 1; ++col){
+            // destination_image[row * width + col] = sobel_calculations(sobel_filter, source_image, row, width, col);
             destination_image[row * width + col] = sobel_filter[0][0] * source_image[(row - 1) * width + col - 1] + sobel_filter[0][1] * source_image[(row - 1) * width + col + 0] + sobel_filter[0][2] * source_image[(row - 1) * width + col + 1] +
                                                    sobel_filter[1][0] * source_image[(row + 0) * width + col - 1] + sobel_filter[1][1] * source_image[(row + 0) * width + col + 0] + sobel_filter[1][2] * source_image[(row + 0) * width + col + 1] +
                                                    sobel_filter[2][0] * source_image[(row + 1) * width + col - 1] + sobel_filter[2][1] * source_image[(row + 1) * width + col + 0] + sobel_filter[2][2] * source_image[(row + 1) * width + col + 1] ;
@@ -390,7 +400,7 @@ int main(int argc, char** argv){
         return 1;
     }
 
-    convert_black_white(source_image, sWidth, sHeight, sChannels, black_image);
+    convert_black_white(source_image, sWidth, sHeight, black_image);
     stbi_write_png("0 black.png", sWidth, sHeight, 1, black_image, sWidth * 1);
     apply_sobel_0(black_image, black_sobel_0_image, sWidth, sHeight);
     stbi_write_png("1 black_sobel0.png", sWidth, sHeight, 1, black_sobel_0_image, sWidth * 1);

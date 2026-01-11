@@ -4,6 +4,23 @@
 #include "stb_image_write.h"
 
 #include <stdio.h>
+#include <time.h>
+
+// Load Image
+int Load_Image(unsigned char** source_image_space, int* width, int* height, int* channel, char* source_image_name){
+    *source_image_space = stbi_load(source_image_name, width, height, channel, 0);
+    if(*source_image_space == NULL){
+        fprintf(stderr, "Error Loading Image : %s\n", source_image_name);
+        return 1;
+    }
+    if(*channel != 3){
+        fprintf(stderr, "Channel Mismatch, Only Allowed : 3\n");
+        stbi_image_free(*source_image_space);
+        return 1;
+    }
+    printf("Loaded image with width %d, height %d, channels %d\n", *width, *height, *channel);
+    return 0;
+}
 
 // Convert a RGB image to Black and White ( 24bits -> 8bits )
 void convert_black_white(const unsigned char* source_image, int width, int height, unsigned char* destination_image){
@@ -50,7 +67,7 @@ void apply_filter(const unsigned char* source_image, unsigned char* destination_
     }
 }
 
-// Apply Sobel 0 Direction X or Y Dir ( X = 0, Y = 1)
+// Apply Sobel 0 Direction X or Y Dir ( X = 0, Y = 1 )
 void apply_sobel_0(const unsigned char* source_image, unsigned char* destination_image, int width, int height, int dir, int trim, int square){
     int sobel_filter_x[3][3] = {{-1, -2, -1},
                                 { 0,  0,  0},
@@ -64,71 +81,106 @@ void apply_sobel_0(const unsigned char* source_image, unsigned char* destination
     else         apply_filter(source_image, destination_image, height, width, sobel_filter_y, trim, square);
 }
 
-// Apply Sobel 1 Direction X Dir
-void apply_sobel_1(const unsigned char* source_image, unsigned char* destination_image, int width, int height){
-    int sobel_filter[3][3] = {{-2, -1,  0},
-                              {-1,  0,  1},
-                              { 0,  1,  2}};
+// Apply Sobel 1 Direction X or Y Dir ( X = 0, Y = 1 )
+void apply_sobel_1(const unsigned char* source_image, unsigned char* destination_image, int width, int height, int dir, int trim, int square){
+    int sobel_filter_x[3][3] = {{-2, -1,  0},
+                                {-1,  0,  1},
+                                { 0,  1,  2}};
 
-    apply_filter(source_image, destination_image, height, width, sobel_filter, 1, 1);
+    int sobel_filter_y[3][3] = {{ 0, -1, -2},
+                                { 1,  0, -1},
+                                { 2,  1,  0}};
+
+    if(dir == 0) apply_filter(source_image, destination_image, height, width, sobel_filter_x, trim, square);
+    else         apply_filter(source_image, destination_image, height, width, sobel_filter_y, trim, square);
 }
 
-// Apply Sobel 2 Direction X Dir
-void apply_sobel_2(const unsigned char* source_image, unsigned char* destination_image, int width, int height){
-    int sobel_filter[3][3] = {{-1,  0,  1},
-                              {-2,  0,  2},
-                              {-1,  0,  1}};
+// Apply Sobel 2 Direction X or Y Dir ( X = 0, Y = 1 )
+void apply_sobel_2(const unsigned char* source_image, unsigned char* destination_image, int width, int height, int dir, int trim, int square){
+    int sobel_filter_x[3][3] = {{-1,  0,  1},
+                                {-2,  0,  2},
+                                {-1,  0,  1}};
 
-    apply_filter(source_image, destination_image, height, width, sobel_filter, 1, 1);
+    int sobel_filter_y[3][3] = {{-1, -2, -1},
+                                { 0,  0,  0},
+                                { 1,  2,  1}};
+
+    if(dir == 0) apply_filter(source_image, destination_image, height, width, sobel_filter_x, trim, square);
+    else         apply_filter(source_image, destination_image, height, width, sobel_filter_y, trim, square);
 }
 
-// Apply Sobel 3 Direction X Dir
-void apply_sobel_3(const unsigned char* source_image, unsigned char* destination_image, int width, int height){
-    int sobel_filter[3][3] = {{ 0,  1,  2},
-                              {-1,  0,  1},
-                              {-2, -1,  0}};
+// Apply Sobel 3 Direction X or Y Dir ( X = 0, Y = 1 )
+void apply_sobel_3(const unsigned char* source_image, unsigned char* destination_image, int width, int height, int dir, int trim, int square){
+    int sobel_filter_x[3][3] = {{ 0,  1,  2},
+                                {-1,  0,  1},
+                                {-2, -1,  0}};
 
-    apply_filter(source_image, destination_image, height, width, sobel_filter, 1, 1);
+    int sobel_filter_y[3][3] = {{-2, -1, 0},
+                                {-1,  0, 1},
+                                { 0,  1, 2}};
+
+    if(dir == 0) apply_filter(source_image, destination_image, height, width, sobel_filter_x, trim, square);
+    else         apply_filter(source_image, destination_image, height, width, sobel_filter_y, trim, square);
 }
 
-// Apply Sobel 4 Direction X Dir
-void apply_sobel_4(const unsigned char* source_image, unsigned char* destination_image, int width, int height){
-    int sobel_filter[3][3] = {{ 1,  2,  1},
-                              { 0,  0,  0},
-                              {-1, -2, -1}};
+// Apply Sobel 4 Direction X or Y Dir ( X = 0, Y = 1 )
+void apply_sobel_4(const unsigned char* source_image, unsigned char* destination_image, int width, int height, int dir, int trim, int square){
+    int sobel_filter_x[3][3] = {{ 1,  2,  1},
+                                { 0,  0,  0},
+                                {-1, -2, -1}};
 
-    apply_filter(source_image, destination_image, height, width, sobel_filter, 1, 1);
+    int sobel_filter_y[3][3] = {{-1,  0, 1},
+                                {-2,  0, 2},
+                                {-1,  0, 1}};
+
+    if(dir == 0) apply_filter(source_image, destination_image, height, width, sobel_filter_x, trim, square);
+    else         apply_filter(source_image, destination_image, height, width, sobel_filter_y, trim, square);
 }
 
-// Apply Sobel 5 Direction X Dir
-void apply_sobel_5(const unsigned char* source_image, unsigned char* destination_image, int width, int height){
-    int sobel_filter[3][3] = {{ 2,  1,  0},
-                              { 1,  0, -1},
-                              { 0, -1, -2}};
+// Apply Sobel 5 Direction X or Y Dir ( X = 0, Y = 1 )
+void apply_sobel_5(const unsigned char* source_image, unsigned char* destination_image, int width, int height, int dir, int trim, int square){
+    int sobel_filter_x[3][3] = {{ 2,  1,  0},
+                                { 1,  0, -1},
+                                { 0, -1, -2}};
+                    
+    int sobel_filter_y[3][3] = {{ 0,  1, 2},
+                                {-1,  0, 1},
+                                {-2, -1, 0}};
 
-    apply_filter(source_image, destination_image, height, width, sobel_filter, 1, 1);
+    if(dir == 0) apply_filter(source_image, destination_image, height, width, sobel_filter_x, trim, square);
+    else         apply_filter(source_image, destination_image, height, width, sobel_filter_y, trim, square);
 }
 
-// Apply Sobel 6 Direction X Dir
-void apply_sobel_6(const unsigned char* source_image, unsigned char* destination_image, int width, int height){
-    int sobel_filter[3][3] = {{ 1,  0, -1},
-                              { 2,  0, -2},
-                              { 1,  0, -1}};
+// Apply Sobel 6 Direction X or Y Dir ( X = 0, Y = 1 )
+void apply_sobel_6(const unsigned char* source_image, unsigned char* destination_image, int width, int height, int dir, int trim, int square){
+    int sobel_filter_x[3][3] = {{ 1,  0, -1},
+                                { 2,  0, -2},
+                                { 1,  0, -1}};
 
-    apply_filter(source_image, destination_image, height, width, sobel_filter, 1, 1);
+    int sobel_filter_y[3][3] = {{ 1,  2, 1},
+                                { 0,  0, 0},
+                                {-1, -2,-1}};
+
+    if(dir == 0) apply_filter(source_image, destination_image, height, width, sobel_filter_x, trim, square);
+    else         apply_filter(source_image, destination_image, height, width, sobel_filter_y, trim, square);
 }
 
-// Apply Sobel 7 Direction X Dir
-void apply_sobel_7(const unsigned char* source_image, unsigned char* destination_image, int width, int height){
-    int sobel_filter[3][3] = {{ 0, -1, -2},
-                              { 1,  0, -1},
-                              { 2,  1,  0}};
+// Apply Sobel 7 Direction X or Y Dir ( X = 0, Y = 1 )
+void apply_sobel_7(const unsigned char* source_image, unsigned char* destination_image, int width, int height, int dir, int trim, int square){
+    int sobel_filter_x[3][3] = {{ 0, -1, -2},
+                                { 1,  0, -1},
+                                { 2,  1,  0}};
 
-    apply_filter(source_image, destination_image, height, width, sobel_filter, 1, 1);
+    int sobel_filter_y[3][3] = {{ 2,  1, 0},
+                                { 1,  0,-1},
+                                { 0, -1,-2}};
+
+    if(dir == 0) apply_filter(source_image, destination_image, height, width, sobel_filter_x, trim, square);
+    else         apply_filter(source_image, destination_image, height, width, sobel_filter_y, trim, square);
 }
 
 // Apply Sobel 0 Direction X&Y Dir
-void apply_advance_sobel_0(const unsigned char* source_image, int width, int height, unsigned char* destination_image){
+void apply_advance_sobel_0(const unsigned char* source_image, int width, int height, unsigned char* destination_image, int trim){
     int Gx[3][3] = {{-1,-2,-1},
                     { 0, 0, 0},
                     { 1, 2, 1}};
@@ -139,15 +191,16 @@ void apply_advance_sobel_0(const unsigned char* source_image, int width, int hei
 
     for(int row = 1; row < height - 1; ++row){
         for(int col = 1; col < width - 1; ++col){
-            int gx = sobel_calculations(Gx, source_image, row, width, col, 1, 1);
-            int gy = sobel_calculations(Gy, source_image, row, width, col, 1, 1);
+            int gx = sobel_calculations(Gx, source_image, row, width, col, trim, 0);
+            int gy = sobel_calculations(Gy, source_image, row, width, col, trim, 0);
 
             destination_image[row * width + col] = sqrt(gx * gx + gy * gy);
         }
     }
 }
 
-void apply_advance_sobel_1(const unsigned char* source_image, int width, int height, unsigned char* destination_image){
+// Apply Sobel 1 Direction X&Y Dir
+void apply_advance_sobel_1(const unsigned char* source_image, int width, int height, unsigned char* destination_image, int trim){
     int Gx[3][3] = {{-2,-1, 0},
                     {-1, 0, 1},
                     { 0, 1, 2}};
@@ -158,15 +211,16 @@ void apply_advance_sobel_1(const unsigned char* source_image, int width, int hei
 
     for(int row = 1; row < height - 1; ++row){
         for(int col = 1; col < width - 1; ++col){
-            int gx = sobel_calculations(Gx, source_image, row, width, col, 1, 1);
-            int gy = sobel_calculations(Gy, source_image, row, width, col, 1, 1);
+            int gx = sobel_calculations(Gx, source_image, row, width, col, trim, 0);
+            int gy = sobel_calculations(Gy, source_image, row, width, col, trim, 0);
 
             destination_image[row * width + col] = sqrt(gx * gx + gy * gy);
         }
     }
 }
 
-void apply_advance_sobel_2(const unsigned char* source_image, int width, int height, unsigned char* destination_image){
+// Apply Sobel 2 Direction X&Y Dir
+void apply_advance_sobel_2(const unsigned char* source_image, int width, int height, unsigned char* destination_image, int trim){
     int Gx[3][3] = {{-1, 0, 1},
                     {-2, 0, 2},
                     {-1, 0, 1}};
@@ -177,15 +231,16 @@ void apply_advance_sobel_2(const unsigned char* source_image, int width, int hei
 
     for(int row = 1; row < height - 1; ++row){
         for(int col = 1; col < width - 1; ++col){
-            int gx = sobel_calculations(Gx, source_image, row, width, col, 1, 1);
-            int gy = sobel_calculations(Gy, source_image, row, width, col, 1, 1);
+            int gx = sobel_calculations(Gx, source_image, row, width, col, trim, 0);
+            int gy = sobel_calculations(Gy, source_image, row, width, col, trim, 0);
 
             destination_image[row * width + col] = sqrt(gx * gx + gy * gy);
         }
     }
 }
 
-void apply_advance_sobel_3(const unsigned char* source_image, int width, int height, unsigned char* destination_image){
+// Apply Sobel 3 Direction X&Y Dir
+void apply_advance_sobel_3(const unsigned char* source_image, int width, int height, unsigned char* destination_image, int trim){
     int Gx[3][3] = {{ 0, 1, 2},
                     {-1, 0, 1},
                     {-2,-1, 0}};
@@ -196,15 +251,16 @@ void apply_advance_sobel_3(const unsigned char* source_image, int width, int hei
 
     for(int row = 1; row < height - 1; ++row){
         for(int col = 1; col < width - 1; ++col){
-            int gx = sobel_calculations(Gx, source_image, row, width, col, 1, 1);
-            int gy = sobel_calculations(Gy, source_image, row, width, col, 1, 1);
+            int gx = sobel_calculations(Gx, source_image, row, width, col, trim, 0);
+            int gy = sobel_calculations(Gy, source_image, row, width, col, trim, 0);
 
             destination_image[row * width + col] = sqrt(gx * gx + gy * gy);
         }
     }
 }
 
-void apply_advance_sobel_4(const unsigned char* source_image, int width, int height, unsigned char* destination_image){
+// Apply Sobel 4 Direction X&Y Dir
+void apply_advance_sobel_4(const unsigned char* source_image, int width, int height, unsigned char* destination_image, int trim){
     int Gx[3][3] = {{ 1, 2, 1},
                     { 0, 0, 0},
                     {-1,-2,-1}};
@@ -215,15 +271,16 @@ void apply_advance_sobel_4(const unsigned char* source_image, int width, int hei
 
     for(int row = 1; row < height - 1; ++row){
         for(int col = 1; col < width - 1; ++col){
-            int gx = sobel_calculations(Gx, source_image, row, width, col, 1, 1);
-            int gy = sobel_calculations(Gy, source_image, row, width, col, 1, 1);
+            int gx = sobel_calculations(Gx, source_image, row, width, col, trim, 0);
+            int gy = sobel_calculations(Gy, source_image, row, width, col, trim, 0);
 
             destination_image[row * width + col] = sqrt(gx * gx + gy * gy);
         }
     }
 }
 
-void apply_advance_sobel_5(const unsigned char* source_image, int width, int height, unsigned char* destination_image){
+// Apply Sobel 5 Direction X&Y Dir
+void apply_advance_sobel_5(const unsigned char* source_image, int width, int height, unsigned char* destination_image, int trim){
     int Gx[3][3] = {{ 2, 1, 0},
                     { 1, 0,-1},
                     { 0,-1,-2}};
@@ -234,15 +291,16 @@ void apply_advance_sobel_5(const unsigned char* source_image, int width, int hei
 
     for(int row = 1; row < height - 1; ++row){
         for(int col = 1; col < width - 1; ++col){
-            int gx = sobel_calculations(Gx, source_image, row, width, col, 1, 1);
-            int gy = sobel_calculations(Gy, source_image, row, width, col, 1, 1);
+            int gx = sobel_calculations(Gx, source_image, row, width, col, trim, 0);
+            int gy = sobel_calculations(Gy, source_image, row, width, col, trim, 0);
 
             destination_image[row * width + col] = sqrt(gx * gx + gy * gy);
         }
     }
 }
 
-void apply_advance_sobel_6(const unsigned char* source_image, int width, int height, unsigned char* destination_image){
+// Apply Sobel 6 Direction X&Y Dir
+void apply_advance_sobel_6(const unsigned char* source_image, int width, int height, unsigned char* destination_image, int trim){
     int Gx[3][3] = {{ 1, 0,-1},
                     { 2, 0,-2},
                     { 1, 0,-1}};
@@ -253,15 +311,16 @@ void apply_advance_sobel_6(const unsigned char* source_image, int width, int hei
 
     for(int row = 1; row < height - 1; ++row){
         for(int col = 1; col < width - 1; ++col){
-            int gx = sobel_calculations(Gx, source_image, row, width, col, 1, 1);
-            int gy = sobel_calculations(Gy, source_image, row, width, col, 1, 1);
+            int gx = sobel_calculations(Gx, source_image, row, width, col, trim, 0);
+            int gy = sobel_calculations(Gy, source_image, row, width, col, trim, 0);
 
             destination_image[row * width + col] = sqrt(gx * gx + gy * gy);
         }
     }
 }
 
-void apply_advance_sobel_7(const unsigned char* source_image, int width, int height, unsigned char* destination_image){
+// Apply Sobel 7 Direction X&Y Dir
+void apply_advance_sobel_7(const unsigned char* source_image, int width, int height, unsigned char* destination_image, int trim){
     int Gx[3][3] = {{ 0,-1,-2},
                     { 1, 0,-1},
                     { 2, 1, 0}};
@@ -272,200 +331,250 @@ void apply_advance_sobel_7(const unsigned char* source_image, int width, int hei
 
     for(int row = 1; row < height - 1; ++row){
         for(int col = 1; col < width - 1; ++col){
-            int gx = sobel_calculations(Gx, source_image, row, width, col, 1, 1);
-            int gy = sobel_calculations(Gy, source_image, row, width, col, 1, 1);
+            int gx = sobel_calculations(Gx, source_image, row, width, col, trim, 0);
+            int gy = sobel_calculations(Gy, source_image, row, width, col, trim, 0);
 
             destination_image[row * width + col] = sqrt(gx * gx + gy * gy);
         }
     }
 }
 
-int main(int argc, char** argv){
-    if(argc != 2){
-        fprintf(stderr, "Only One Argument Allowed : code.exe image.png\n");
-        return 1;
-    }
+int main(){
 
     int source_width, source_height, source_channels;
-    unsigned char* source_image = stbi_load(argv[1], &source_width, &source_height, &source_channels, 0);
-    if(source_image == NULL){
-        fprintf(stderr, "Error Loading Image : %s\n", argv[1]);
-        return 1;
+    unsigned char* source_image;
+
+    unsigned char* bit8_black_image_space = NULL;
+    unsigned char* bit8_image_space = NULL;
+    unsigned char* bit24_image_space = NULL;
+
+    int running = 1;
+    int format = 0;
+    while(running){
+        printf("Write Number to Choose :\n");
+        printf("0. Exit\n");
+        printf("1. Change Image\n");
+        printf("2. Apply Black and White\n");
+        printf("3. Apply Inverse to Black and White\n");
+        printf("4. Apply Simple Sobel\n");
+        printf("5. Apply Advance Sobel\n");
+        printf("6. Change Image Ourput Format\n");
+
+        int choice;
+        scanf("%d", &choice);
+
+        // Exiting
+        if(choice == 0) running = 0;
+
+        // Choosing Image
+        else if(choice == 1){
+            printf("Image can only be of 3 Channel, Like : RGB\n");
+            printf("Write name of image Like : source.png\n");
+            char image_name[256];
+            scanf("%256s", image_name);
+
+            if(Load_Image(&source_image, &source_width, &source_height, &source_channels, image_name)){
+                fprintf(stderr, "Error Loading Image : %s\n Try Again...\n", image_name);
+            }
+
+            bit8_black_image_space = malloc((size_t)source_width * source_height * 1);
+            bit8_image_space = malloc((size_t)source_width * source_height * 1);
+            bit24_image_space = malloc((size_t)source_width * source_height * 3);
+
+            if(bit8_image_space == NULL || bit24_image_space == NULL || bit8_black_image_space == NULL){
+                fprintf(stderr, "Memory Allocation Failed\n");
+                return 1;
+            }
+        }
+
+        // Getting Black and White Image
+        else if(choice == 2){
+            if(source_image == NULL){
+                fprintf(stderr, "Image Not Selected, First Select Image\n");
+                continue;
+            }
+
+            convert_black_white(source_image, source_width, source_height, bit8_black_image_space);
+
+            time_t rawTime;
+            time(&rawTime);
+            char buffer[80];
+            struct tm *timeinfo;
+
+            timeinfo = localtime(&rawTime);
+            strftime(buffer, sizeof(buffer), "%Y-%m-%d_%H-%M-%S", timeinfo);
+
+
+            if(format == 0){
+                strcat(buffer, "_Black&White.png");
+                stbi_write_png(buffer, source_width, source_height, 1, bit8_black_image_space, source_width * 1);
+            }
+            else if(format == 1){
+                strcat(buffer, "_Black&White.jpg");
+                stbi_write_jpg(buffer, source_width, source_height, 1, bit8_black_image_space, source_width * 1);
+            }
+
+            printf("Image Processed : %s\n", buffer);
+        }
+
+        // Inversing Black and White Image
+        else if(choice == 3){
+            if(source_image == NULL){
+                fprintf(stderr, "Image Not Selected, First Select Image\n");
+                continue;
+            }
+
+            convert_black_white(source_image, source_width, source_height, bit8_black_image_space);
+            inverse_black(bit8_black_image_space, source_width, source_height, bit8_image_space);
+
+            time_t rawTime;
+            time(&rawTime);
+            char buffer[80];
+            struct tm *timeinfo;
+
+            timeinfo = localtime(&rawTime);
+            strftime(buffer, sizeof(buffer), "%Y-%m-%d_%H-%M-%S", timeinfo);
+
+            if(format == 0){
+                strcat(buffer, "_Inverse_Black&White.png");
+                stbi_write_png(buffer, source_width, source_height, 1, bit8_image_space, source_width * 1);
+            }
+            else if(format == 1){
+                strcat(buffer, "_Inverse_Black&White.jpg");
+                stbi_write_jpg(buffer, source_width, source_height, 1, bit8_image_space, source_width * 1);
+            }
+
+            printf("Image Processed : %s\n", buffer);
+        }
+
+        // Apply Sobel
+        else if(choice == 4){
+            if(source_image == NULL){
+                fprintf(stderr, "Image Not Selected, First Select Image\n");
+                continue;
+            }
+
+            int choice_num, choice_dir, choice_trim, choice_square;
+
+            printf("Write Your Choice : Sobel_Num Sobel_Dir Sobel_Trim Sobel_Square\n");
+            printf("Example : 0 0 0 0 : 0 Direction , X Direction, Trim FALSE, Square False\n");
+            scanf("%d %d %d %d", &choice_num, &choice_dir, &choice_trim, &choice_square);
+
+            if(choice_num < 0 || choice_num > 7) choice_num = 0;
+            if(choice_dir < 0 || choice_dir > 1) choice_dir = 0;
+            if(choice_trim < 0 || choice_trim > 1) choice_trim = 0;
+            if(choice_square < 0 || choice_square > 1) choice_square = 0;
+
+            convert_black_white(source_image, source_width, source_height, bit8_black_image_space);
+
+            if(choice_num == 0) apply_sobel_0(bit8_black_image_space, bit8_image_space, source_width, source_height, choice_dir, choice_trim, choice_square);
+            else if(choice_num == 1) apply_sobel_1(bit8_black_image_space, bit8_image_space, source_width, source_height, choice_dir, choice_trim, choice_square);
+            else if(choice_num == 2) apply_sobel_2(bit8_black_image_space, bit8_image_space, source_width, source_height, choice_dir, choice_trim, choice_square);
+            else if(choice_num == 3) apply_sobel_3(bit8_black_image_space, bit8_image_space, source_width, source_height, choice_dir, choice_trim, choice_square);
+            else if(choice_num == 4) apply_sobel_4(bit8_black_image_space, bit8_image_space, source_width, source_height, choice_dir, choice_trim, choice_square);
+            else if(choice_num == 5) apply_sobel_5(bit8_black_image_space, bit8_image_space, source_width, source_height, choice_dir, choice_trim, choice_square);
+            else if(choice_num == 6) apply_sobel_6(bit8_black_image_space, bit8_image_space, source_width, source_height, choice_dir, choice_trim, choice_square);
+            else if(choice_num == 7) apply_sobel_7(bit8_black_image_space, bit8_image_space, source_width, source_height, choice_dir, choice_trim, choice_square);
+
+            time_t rawTime;
+            time(&rawTime);
+            char buffer[80];
+            struct tm *timeinfo;
+
+            timeinfo = localtime(&rawTime);
+            strftime(buffer, sizeof(buffer), "%Y-%m-%d_%H-%M-%S", timeinfo);
+
+            if(format == 0){
+                strcat(buffer, "_sobel.png");
+                stbi_write_png(buffer, source_width, source_height, 1, bit8_image_space, source_width * 1);
+            }
+            else if(format == 1){
+                strcat(buffer, "_sobel.jpg");
+                stbi_write_jpg(buffer, source_width, source_height, 1, bit8_image_space, source_width * 1);
+            }
+
+            printf("Image Processed : %s\n", buffer);
+        }
+
+        // Apply Advance Sobel
+        else if(choice == 5){
+            if(source_image == NULL){
+                fprintf(stderr, "Image Not Selected, First Select Image\n");
+                continue;
+            }
+
+            int choice_num, choice_trim;
+
+            printf("Write Your Choice : Sobel_Num Sobel_Trim\n");
+            printf("Example : 0 0 : 0 Trim FALSE\n");
+            scanf("%d %d %d %d", &choice_num, &choice_trim);
+
+            if(choice_num < 0 || choice_num > 7) choice_num = 0;
+            if(choice_trim < 0 || choice_trim > 1) choice_trim = 0;
+            
+            convert_black_white(source_image, source_width, source_height, bit8_black_image_space);
+
+            if(choice_num == 0) apply_advance_sobel_0(bit8_black_image_space, source_width, source_height, bit8_image_space, choice_trim);
+            else if(choice_num == 1) apply_advance_sobel_1(bit8_black_image_space, source_width, source_height, bit8_image_space, choice_trim);
+            else if(choice_num == 2) apply_advance_sobel_2(bit8_black_image_space, source_width, source_height, bit8_image_space, choice_trim);
+            else if(choice_num == 3) apply_advance_sobel_3(bit8_black_image_space, source_width, source_height, bit8_image_space, choice_trim);
+            else if(choice_num == 4) apply_advance_sobel_4(bit8_black_image_space, source_width, source_height, bit8_image_space, choice_trim);
+            else if(choice_num == 5) apply_advance_sobel_5(bit8_black_image_space, source_width, source_height, bit8_image_space, choice_trim);
+            else if(choice_num == 6) apply_advance_sobel_6(bit8_black_image_space, source_width, source_height, bit8_image_space, choice_trim);
+            else if(choice_num == 7) apply_advance_sobel_7(bit8_black_image_space, source_width, source_height, bit8_image_space, choice_trim);
+
+            time_t rawTime;
+            time(&rawTime);
+            char buffer[80];
+            struct tm *timeinfo;
+
+            timeinfo = localtime(&rawTime);
+            strftime(buffer, sizeof(buffer), "%Y-%m-%d_%H-%M-%S", timeinfo);
+
+            if(format == 0){
+                strcat(buffer, "_sobel.png");
+                stbi_write_png(buffer, source_width, source_height, 1, bit8_image_space, source_width * 1);
+            }
+            else if(format == 1){
+                strcat(buffer, "_sobel.jpg");
+                stbi_write_jpg(buffer, source_width, source_height, 1, bit8_image_space, source_width * 1);
+            }
+
+            printf("Image Processed : %s\n", buffer);
+        }
+
+        // Format Selection
+        else if(choice == 6){
+            printf("Choose Format Type :\n");
+            printf("0. PNG\n");
+            printf("1. JPEG\n");
+
+            int format_chocie;
+            scanf("%d", &format_chocie);
+
+            if(format_chocie == 0){
+                printf("Format Choose : .png\n");
+                format = 0;
+            }
+
+            else if(format_chocie == 1){
+                printf("Format Choose : .jpg\n");
+                format = 1;
+            }
+
+            else{
+                fprintf(stderr, "Not Supported Format : %d , DEFAULT : .png\n", format_chocie);
+                format = 1;
+            }
+        }
     }
-    if(source_channels != 3){
-        fprintf(stderr, "Channel Mismatch, Only Allowed : 3\n");
-        stbi_image_free(source_image);
-        return 1;
-    }
-    printf("Loaded image with width %d, height %d, channels %d\n", source_width, source_height, source_channels);
 
-    unsigned char* bit8_image_space = malloc((size_t)source_width * source_height * 1);
-    unsigned char* bit24_image_space = malloc((size_t)source_width * source_height * 3);
-
-    if(bit8_image_space == NULL || bit24_image_space == NULL){
-        fprintf(stderr, "Memory Allocation Failed\n");
-        stbi_image_free(source_image);
-        return 1;
-    }
-
-    unsigned char* black_image = malloc((size_t)source_width * source_height * 1);
-    unsigned char* black_sobel_0_image = malloc((size_t)source_width * source_height * 1);
-    unsigned char* black_sobel_1_image = malloc((size_t)source_width * source_height * 1);
-    unsigned char* black_sobel_2_image = malloc((size_t)source_width * source_height * 1);
-    unsigned char* black_sobel_3_image = malloc((size_t)source_width * source_height * 1);
-    unsigned char* black_sobel_4_image = malloc((size_t)source_width * source_height * 1);
-    unsigned char* black_sobel_5_image = malloc((size_t)source_width * source_height * 1);
-    unsigned char* black_sobel_6_image = malloc((size_t)source_width * source_height * 1);
-    unsigned char* black_sobel_7_image = malloc((size_t)source_width * source_height * 1);
-
-    unsigned char* white_image = malloc((size_t)source_width * source_height * 1);
-    unsigned char* white_sobel_0_image = malloc((size_t)source_width * source_height * 1);
-    unsigned char* white_sobel_1_image = malloc((size_t)source_width * source_height * 1);
-    unsigned char* white_sobel_2_image = malloc((size_t)source_width * source_height * 1);
-    unsigned char* white_sobel_3_image = malloc((size_t)source_width * source_height * 1);
-    unsigned char* white_sobel_4_image = malloc((size_t)source_width * source_height * 1);
-    unsigned char* white_sobel_5_image = malloc((size_t)source_width * source_height * 1);
-    unsigned char* white_sobel_6_image = malloc((size_t)source_width * source_height * 1);
-    unsigned char* white_sobel_7_image = malloc((size_t)source_width * source_height * 1);
-
-    unsigned char* advance_black_sobel_0_image = malloc((size_t)source_width * source_height * 1);
-    unsigned char* advance_black_sobel_1_image = malloc((size_t)source_width * source_height * 1);
-    unsigned char* advance_black_sobel_2_image = malloc((size_t)source_width * source_height * 1);
-    unsigned char* advance_black_sobel_3_image = malloc((size_t)source_width * source_height * 1);
-    unsigned char* advance_black_sobel_4_image = malloc((size_t)source_width * source_height * 1);
-    unsigned char* advance_black_sobel_5_image = malloc((size_t)source_width * source_height * 1);
-    unsigned char* advance_black_sobel_6_image = malloc((size_t)source_width * source_height * 1);
-    unsigned char* advance_black_sobel_7_image = malloc((size_t)source_width * source_height * 1);
-
-    unsigned char* advance_white_sobel_0_image = malloc((size_t)source_width * source_height * 1);
-    unsigned char* advance_white_sobel_1_image = malloc((size_t)source_width * source_height * 1);
-    unsigned char* advance_white_sobel_2_image = malloc((size_t)source_width * source_height * 1);
-    unsigned char* advance_white_sobel_3_image = malloc((size_t)source_width * source_height * 1);
-    unsigned char* advance_white_sobel_4_image = malloc((size_t)source_width * source_height * 1);
-    unsigned char* advance_white_sobel_5_image = malloc((size_t)source_width * source_height * 1);
-    unsigned char* advance_white_sobel_6_image = malloc((size_t)source_width * source_height * 1);
-    unsigned char* advance_white_sobel_7_image = malloc((size_t)source_width * source_height * 1);
-
-    if(black_image == NULL || black_sobel_0_image == NULL || black_sobel_1_image == NULL || black_sobel_2_image == NULL || black_sobel_3_image == NULL || black_sobel_4_image == NULL || black_sobel_5_image == NULL || black_sobel_6_image == NULL || black_sobel_7_image == NULL || white_image == NULL || white_sobel_0_image == NULL || white_sobel_1_image == NULL || white_sobel_2_image == NULL || white_sobel_3_image == NULL || white_sobel_4_image == NULL || white_sobel_5_image == NULL || white_sobel_6_image == NULL || white_sobel_7_image == NULL || advance_black_sobel_0_image == NULL || advance_black_sobel_1_image == NULL || advance_black_sobel_2_image == NULL || advance_black_sobel_3_image == NULL || advance_black_sobel_4_image == NULL || advance_black_sobel_5_image == NULL || advance_black_sobel_6_image == NULL || advance_black_sobel_7_image == NULL || advance_white_sobel_0_image == NULL || advance_white_sobel_1_image == NULL || advance_white_sobel_2_image == NULL || advance_white_sobel_3_image == NULL || advance_white_sobel_4_image == NULL || advance_white_sobel_5_image == NULL || advance_white_sobel_6_image == NULL || advance_white_sobel_7_image == NULL){
-        fprintf(stderr, "Error Memory Allocation\n");
-        stbi_image_free(free);
-        return 1;
-    }
-
-    convert_black_white(source_image, source_width, source_height, black_image);
-    stbi_write_png("0 black.jpeg", source_width, source_height, 1, black_image, source_width * 1);
-    apply_sobel_0(black_image, black_sobel_0_image, source_width, source_height, 0, 1, 1);
-    stbi_write_png("1 black_sobel0.jpeg", source_width, source_height, 1, black_sobel_0_image, source_width * 1);
-    apply_sobel_1(black_image, black_sobel_1_image, source_width, source_height);
-    stbi_write_png("2 black_sobel1.jpeg", source_width, source_height, 1, black_sobel_1_image, source_width * 1);
-    apply_sobel_2(black_image, black_sobel_2_image, source_width, source_height);
-    stbi_write_png("3 black_sobel2.jpeg", source_width, source_height, 1, black_sobel_2_image, source_width * 1);
-    apply_sobel_3(black_image, black_sobel_3_image, source_width, source_height);
-    stbi_write_png("4 black_sobel3.jpeg", source_width, source_height, 1, black_sobel_3_image, source_width * 1);
-    apply_sobel_4(black_image, black_sobel_4_image, source_width, source_height);
-    stbi_write_png("5 black_sobel4.jpeg", source_width, source_height, 1, black_sobel_4_image, source_width * 1);
-    apply_sobel_5(black_image, black_sobel_5_image, source_width, source_height);
-    stbi_write_png("6 black_sobel5.jpeg", source_width, source_height, 1, black_sobel_5_image, source_width * 1);
-    apply_sobel_6(black_image, black_sobel_6_image, source_width, source_height);
-    stbi_write_png("7 black_sobel6.jpeg", source_width, source_height, 1, black_sobel_6_image, source_width * 1);
-    apply_sobel_7(black_image, black_sobel_7_image, source_width, source_height);
-    stbi_write_png("8 black_sobel7.jpeg", source_width, source_height, 1, black_sobel_7_image, source_width * 1);
-
-    inverse_black(black_image, source_width, source_height, white_image);
-    stbi_write_png("9 white.jpeg", source_width, source_height, 1, white_image, source_width * 1);
-    apply_sobel_0(white_image, white_sobel_0_image, source_width, source_height, 0, 1, 1);
-    stbi_write_png("10 white_sobel0.jpeg", source_width, source_height, 1, white_sobel_0_image, source_width * 1);
-    apply_sobel_1(white_image, white_sobel_1_image, source_width, source_height);
-    stbi_write_png("11 white_sobel1.jpeg", source_width, source_height, 1, white_sobel_1_image, source_width * 1);
-    apply_sobel_2(white_image, white_sobel_2_image, source_width, source_height);
-    stbi_write_png("12 white_sobel2.jpeg", source_width, source_height, 1, white_sobel_2_image, source_width * 1);
-    apply_sobel_3(white_image, white_sobel_3_image, source_width, source_height);
-    stbi_write_png("13 white_sobel3.jpeg", source_width, source_height, 1, white_sobel_3_image, source_width * 1);
-    apply_sobel_4(white_image, white_sobel_4_image, source_width, source_height);
-    stbi_write_png("14 white_sobel4.jpeg", source_width, source_height, 1, white_sobel_4_image, source_width * 1);
-    apply_sobel_5(white_image, white_sobel_5_image, source_width, source_height);
-    stbi_write_png("15 white_sobel5.jpeg", source_width, source_height, 1, white_sobel_5_image, source_width * 1);
-    apply_sobel_6(white_image, white_sobel_6_image, source_width, source_height);
-    stbi_write_png("16 white_sobel6.jpeg", source_width, source_height, 1, white_sobel_6_image, source_width * 1);
-    apply_sobel_7(white_image, white_sobel_7_image, source_width, source_height);
-    stbi_write_png("17 white_sobel7.jpeg", source_width, source_height, 1, white_sobel_7_image, source_width * 1);
-
-    apply_advance_sobel_0(black_image, source_width, source_height, advance_black_sobel_0_image);
-    stbi_write_png("18 advance_black_sobel0.jpeg", source_width, source_height, 1, advance_black_sobel_0_image, source_width * 1);
-    apply_advance_sobel_1(black_image, source_width, source_height, advance_black_sobel_1_image);
-    stbi_write_png("19 advance_black_sobel1.jpeg", source_width, source_height, 1, advance_black_sobel_1_image, source_width * 1);
-    apply_advance_sobel_2(black_image, source_width, source_height, advance_black_sobel_2_image);
-    stbi_write_png("20 advance_black_sobel2.jpeg", source_width, source_height, 1, advance_black_sobel_2_image, source_width * 1);
-    apply_advance_sobel_3(black_image, source_width, source_height, advance_black_sobel_3_image);
-    stbi_write_png("21 advance_black_sobel3.jpeg", source_width, source_height, 1, advance_black_sobel_3_image, source_width * 1);
-    apply_advance_sobel_4(black_image, source_width, source_height, advance_black_sobel_4_image);
-    stbi_write_png("22 advance_black_sobel4.jpeg", source_width, source_height, 1, advance_black_sobel_4_image, source_width * 1);
-    apply_advance_sobel_5(black_image, source_width, source_height, advance_black_sobel_5_image);
-    stbi_write_png("23 advance_black_sobel5.jpeg", source_width, source_height, 1, advance_black_sobel_5_image, source_width * 1);
-    apply_advance_sobel_6(black_image, source_width, source_height, advance_black_sobel_6_image);
-    stbi_write_png("24 advance_black_sobel6.jpeg", source_width, source_height, 1, advance_black_sobel_6_image, source_width * 1);
-    apply_advance_sobel_7(black_image, source_width, source_height, advance_black_sobel_7_image);
-    stbi_write_png("25 advance_black_sobel7.jpeg", source_width, source_height, 1, advance_black_sobel_7_image, source_width * 1);
-
-    apply_advance_sobel_0(white_image, source_width, source_height, advance_white_sobel_0_image);
-    stbi_write_png("26 advance_white_sobel0.jpeg", source_width, source_height, 1, advance_white_sobel_0_image, source_width * 1);
-    apply_advance_sobel_1(white_image, source_width, source_height, advance_white_sobel_1_image);
-    stbi_write_png("27 advance_white_sobel1.jpeg", source_width, source_height, 1, advance_white_sobel_1_image, source_width * 1);
-    apply_advance_sobel_2(white_image, source_width, source_height, advance_white_sobel_2_image);
-    stbi_write_png("28 advance_white_sobel2.jpeg", source_width, source_height, 1, advance_white_sobel_2_image, source_width * 1);
-    apply_advance_sobel_3(white_image, source_width, source_height, advance_white_sobel_3_image);
-    stbi_write_png("29 advance_white_sobel3.jpeg", source_width, source_height, 1, advance_white_sobel_3_image, source_width * 1);
-    apply_advance_sobel_4(white_image, source_width, source_height, advance_white_sobel_4_image);
-    stbi_write_png("30 advance_white_sobel4.jpeg", source_width, source_height, 1, advance_white_sobel_4_image, source_width * 1);
-    apply_advance_sobel_5(white_image, source_width, source_height, advance_white_sobel_5_image);
-    stbi_write_png("31 advance_white_sobel5.jpeg", source_width, source_height, 1, advance_white_sobel_5_image, source_width * 1);
-    apply_advance_sobel_6(white_image, source_width, source_height, advance_white_sobel_6_image);
-    stbi_write_png("32 advance_white_sobel6.jpeg", source_width, source_height, 1, advance_white_sobel_6_image, source_width * 1);
-    apply_advance_sobel_7(white_image, source_width, source_height, advance_white_sobel_7_image);
-    stbi_write_png("33 advance_white_sobel7.jpeg", source_width, source_height, 1, advance_white_sobel_7_image, source_width * 1);
-
-
+    printf("Closing Program ....\n");
 
     stbi_image_free(source_image);
     free(bit8_image_space);
     free(bit24_image_space);
-    free(black_image);
-    free(black_sobel_0_image);
-    free(black_sobel_1_image);
-    free(black_sobel_2_image);
-    free(black_sobel_3_image);
-    free(black_sobel_4_image);
-    free(black_sobel_5_image);
-    free(black_sobel_6_image);
-    free(black_sobel_7_image);
-
-    free(white_image);
-    free(white_sobel_0_image);
-    free(white_sobel_1_image);
-    free(white_sobel_2_image);
-    free(white_sobel_3_image);
-    free(white_sobel_4_image);
-    free(white_sobel_5_image);
-    free(white_sobel_6_image);
-    free(white_sobel_7_image);
-
-    free(advance_black_sobel_0_image);
-    free(advance_black_sobel_1_image);
-    free(advance_black_sobel_2_image);
-    free(advance_black_sobel_3_image);
-    free(advance_black_sobel_4_image);
-    free(advance_black_sobel_5_image);
-    free(advance_black_sobel_6_image);
-    free(advance_black_sobel_7_image);
-
-    free(advance_white_sobel_0_image);
-    free(advance_white_sobel_1_image);
-    free(advance_white_sobel_2_image);
-    free(advance_white_sobel_3_image);
-    free(advance_white_sobel_4_image);
-    free(advance_white_sobel_5_image);
-    free(advance_white_sobel_6_image);
-    free(advance_white_sobel_7_image);
+    free(bit8_black_image_space);
     
     return 0;
 }

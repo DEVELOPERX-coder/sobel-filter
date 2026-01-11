@@ -5,6 +5,9 @@
 
 #include <stdio.h>
 #include <time.h>
+#include <math.h>
+
+#define PI 3.141592654
 
 // Load Image
 int Load_Image(unsigned char** source_image_space, int* width, int* height, int* channel, char* source_image_name){
@@ -339,6 +342,60 @@ void apply_advance_sobel_7(const unsigned char* source_image, int width, int hei
     }
 }
 
+// Function to convert HSV to RGB 
+void hsv_to_rgb(float h, float s, float v, int *r, int *g, int *b){
+    float c = v * s; // Chroma
+    float x = c * (1 - fabs(fmod(h / 60.0, 2) - 1));
+    float m = v - c;
+    float r1, g1, b1;
+    
+    if (h >= 0 && h < 60) { r1 = c; g1 = x; b1 = 0; }
+    else if (h >= 60 && h < 120) { r1 = x; g1 = c; b1 = 0; }
+    else if (h >= 120 && h < 180) { r1 = 0; g1 = c; b1 = x; }
+    else if (h >= 180 && h < 240) { r1 = 0; g1 = x; b1 = c; }
+    else if (h >= 240 && h < 300) { r1 = x; g1 = 0; b1 = c; }
+    else { r1 = c; g1 = 0; b1 = x; }
+    
+    *r = (int)((r1 + m) * 255);
+    *g = (int)((g1 + m) * 255);
+    *b = (int)((b1 + m) * 255);
+}
+
+// Show Sobel Edge Gradient
+void apply_Edge_Gradient(const unsigned char* bit8_source_image, int width, int height, unsigned char* bit24_destination_image){
+    int Gx[3][3] = {{-1, 0, 1},
+                    {-2, 0, 2},
+                    {-1, 0, 1}};
+
+    int Gy[3][3] = {{-1, -2, -1},
+                    { 0,  0,  0},
+                    { 1,  2,  1}};
+
+    for(int row = 1; row < height - 1; ++row){
+        for(int col = 1; col < width - 1; ++col){
+            int gx = sobel_calculations(Gx, bit8_source_image, row, width, col, 1, 1);
+            int gy = sobel_calculations(Gy, bit8_source_image, row, width, col, 1, 1);
+
+            double magnitude = sqrt(gx * gx + gy * gy);
+            double angle = atan2(gy, gx);
+
+            angle = angle * 180 / PI;
+            if(angle < 0) angle += 360;
+
+            double mag_norm = pow(magnitude / 255.0f, 0.5);
+
+            double gamma = 0.8f;
+
+            int r,g,b;
+            hsv_to_rgb(angle, gamma, mag_norm, &r, &g, &b);
+
+            bit24_destination_image[(row * width + col) * 3 + 0] = r;
+            bit24_destination_image[(row * width + col) * 3 + 1] = g;
+            bit24_destination_image[(row * width + col) * 3 + 2] = b;
+        }
+    }
+}
+
 int main(){
 
     int source_width, source_height, source_channels;
@@ -359,6 +416,7 @@ int main(){
         printf("4. Apply Simple Sobel\n");
         printf("5. Apply Advance Sobel\n");
         printf("6. Change Image Ourput Format\n");
+        printf("7. Apply Edge Gradient\n");
 
         int choice;
         scanf("%d", &choice);
@@ -566,6 +624,36 @@ int main(){
                 fprintf(stderr, "Not Supported Format : %d , DEFAULT : .png\n", format_chocie);
                 format = 1;
             }
+        }
+
+        // Apply Edge Gradient
+        else if(choice == 7){
+            if(source_image == NULL){
+                fprintf(stderr, "Image Not Selected, First Select Image\n");
+                continue;
+            }
+
+            convert_black_white(source_image, source_width, source_height, bit8_black_image_space);
+            apply_Edge_Gradient(bit8_black_image_space, source_width, source_height, bit24_image_space);
+
+            time_t rawTime;
+            time(&rawTime);
+            char buffer[80];
+            struct tm *timeinfo;
+
+            timeinfo = localtime(&rawTime);
+            strftime(buffer, sizeof(buffer), "%Y-%m-%d_%H-%M-%S", timeinfo);
+
+            if(format == 0){
+                strcat(buffer, "_sobel_edge_gradient.png");
+                stbi_write_png(buffer, source_width, source_height, 3, bit24_image_space, source_width * 3);
+            }
+            else if(format == 1){
+                strcat(buffer, "_sobel_edge_gradient.jpg");
+                stbi_write_jpg(buffer, source_width, source_height, 3, bit24_image_space, source_width * 3);
+            }
+
+            printf("Image Processed : %s\n", buffer);
         }
     }
 

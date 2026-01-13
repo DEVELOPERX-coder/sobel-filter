@@ -362,7 +362,7 @@ void hsv_to_rgb(float h, float s, float v, int *r, int *g, int *b){
 }
 
 // Show Sobel Edge Gradient
-void apply_Edge_Gradient(const unsigned char* bit8_source_image, int width, int height, unsigned char* bit24_destination_image){
+void apply_Edge_Gradient(const unsigned char* bit8_source_image, int width, int height, unsigned char* bit24_destination_image, int trim, int square){
     int Gx[3][3] = {{-1, 0, 1},
                     {-2, 0, 2},
                     {-1, 0, 1}};
@@ -373,8 +373,8 @@ void apply_Edge_Gradient(const unsigned char* bit8_source_image, int width, int 
 
     for(int row = 1; row < height - 1; ++row){
         for(int col = 1; col < width - 1; ++col){
-            int gx = sobel_calculations(Gx, bit8_source_image, row, width, col, 1, 1);
-            int gy = sobel_calculations(Gy, bit8_source_image, row, width, col, 1, 1);
+            int gx = sobel_calculations(Gx, bit8_source_image, row, width, col, trim, square);
+            int gy = sobel_calculations(Gy, bit8_source_image, row, width, col, trim, square);
 
             double magnitude = sqrt(gx * gx + gy * gy);
             double angle = atan2(gy, gx);
@@ -383,8 +383,9 @@ void apply_Edge_Gradient(const unsigned char* bit8_source_image, int width, int 
             if(angle < 0) angle += 360;
 
             double mag_norm = pow(magnitude / 255.0f, 0.5);
+            //double mag_norm = magnitude / 255.0f;
 
-            double gamma = 0.8f;
+            double gamma = 1.0f;
 
             int r,g,b;
             hsv_to_rgb(angle, gamma, mag_norm, &r, &g, &b);
@@ -392,6 +393,25 @@ void apply_Edge_Gradient(const unsigned char* bit8_source_image, int width, int 
             bit24_destination_image[(row * width + col) * 3 + 0] = r;
             bit24_destination_image[(row * width + col) * 3 + 1] = g;
             bit24_destination_image[(row * width + col) * 3 + 2] = b;
+        }
+    }
+}
+
+// Apply Gaussian Filter
+void apply_gaussian_filter(const unsigned char* bit8_black_image_space, unsigned char* bit8_image_space, int width, int height){
+    int gaussian_filter[5][5] = {{1,  4,  6,  4, 1},
+                                 {4, 16, 24, 16, 4},
+                                 {6, 24, 36, 24, 6},
+                                 {4, 16, 24, 16, 4},
+                                 {1,  4,  6,  4, 1}};
+
+    for(int row = 2; row < height - 2; ++row){
+        for(int col = 2; col < width - 2; ++col){
+            bit8_image_space[row * width + col] = (gaussian_filter[0][0] * bit8_black_image_space[(row - 2) * width + col - 2] + gaussian_filter[0][1] * bit8_black_image_space[(row - 2) * width + col - 1] + gaussian_filter[0][2] * bit8_black_image_space[(row - 2) * width + col + 0] + gaussian_filter[0][3] * bit8_black_image_space[(row - 2) * width + col + 1] + gaussian_filter[0][4] * bit8_black_image_space[(row - 2) * width + col + 2] +
+                                                   gaussian_filter[1][0] * bit8_black_image_space[(row - 1) * width + col - 2] + gaussian_filter[1][1] * bit8_black_image_space[(row - 1) * width + col - 1] + gaussian_filter[1][2] * bit8_black_image_space[(row - 1) * width + col + 0] + gaussian_filter[1][3] * bit8_black_image_space[(row - 1) * width + col + 1] + gaussian_filter[1][4] * bit8_black_image_space[(row - 1) * width + col + 2] +
+                                                   gaussian_filter[2][0] * bit8_black_image_space[(row + 0) * width + col - 2] + gaussian_filter[2][1] * bit8_black_image_space[(row + 0) * width + col - 1] + gaussian_filter[2][2] * bit8_black_image_space[(row + 0) * width + col + 0] + gaussian_filter[2][3] * bit8_black_image_space[(row + 0) * width + col + 1] + gaussian_filter[2][4] * bit8_black_image_space[(row + 0) * width + col + 2] +
+                                                   gaussian_filter[3][0] * bit8_black_image_space[(row + 1) * width + col - 2] + gaussian_filter[3][1] * bit8_black_image_space[(row + 1) * width + col - 1] + gaussian_filter[3][2] * bit8_black_image_space[(row + 1) * width + col + 0] + gaussian_filter[3][3] * bit8_black_image_space[(row + 1) * width + col + 1] + gaussian_filter[3][4] * bit8_black_image_space[(row + 1) * width + col + 2] +
+                                                   gaussian_filter[4][0] * bit8_black_image_space[(row + 2) * width + col - 2] + gaussian_filter[4][1] * bit8_black_image_space[(row + 2) * width + col - 1] + gaussian_filter[4][2] * bit8_black_image_space[(row + 2) * width + col + 0] + gaussian_filter[4][3] * bit8_black_image_space[(row + 2) * width + col + 1] + gaussian_filter[4][4] * bit8_black_image_space[(row + 2) * width + col + 2] ) / 256 ;
         }
     }
 }
@@ -417,6 +437,7 @@ int main(){
         printf("5. Apply Advance Sobel\n");
         printf("6. Change Image Ourput Format\n");
         printf("7. Apply Edge Gradient\n");
+        printf("8. Apply Gaussian Filter\n");
 
         int choice;
         scanf("%d", &choice);
@@ -633,8 +654,17 @@ int main(){
                 continue;
             }
 
+            int choice_trim, choice_square;
+
+            printf("Write Your Choice : Sobel_Trim Sobel_Square\n");
+            printf("Example : 0 0 : Trim FALSE, Square False\n");
+            scanf("%d %d", &choice_trim, &choice_square);
+
+            if(choice_trim < 0 || choice_trim > 1) choice_trim = 0;
+            if(choice_square < 0 || choice_square > 1) choice_square = 0;
+
             convert_black_white(source_image, source_width, source_height, bit8_black_image_space);
-            apply_Edge_Gradient(bit8_black_image_space, source_width, source_height, bit24_image_space);
+            apply_Edge_Gradient(bit8_black_image_space, source_width, source_height, bit24_image_space, choice_trim, choice_square);
 
             time_t rawTime;
             time(&rawTime);
@@ -651,6 +681,37 @@ int main(){
             else if(format == 1){
                 strcat(buffer, "_sobel_edge_gradient.jpg");
                 stbi_write_jpg(buffer, source_width, source_height, 3, bit24_image_space, source_width * 3);
+            }
+
+            printf("Image Processed : %s\n", buffer);
+        }
+
+        // Apply Gaussian Filter
+        else if(choice == 8){
+            if(source_image == NULL){
+                fprintf(stderr, "Image Not Selected, First Select Image\n");
+                continue;
+            }
+
+            convert_black_white(source_image, source_width, source_height, bit8_black_image_space);
+            apply_gaussian_filter(bit8_black_image_space, bit8_image_space, source_width, source_height);
+
+
+            time_t rawTime;
+            time(&rawTime);
+            char buffer[80];
+            struct tm *timeinfo;
+
+            timeinfo = localtime(&rawTime);
+            strftime(buffer, sizeof(buffer), "%Y-%m-%d_%H-%M-%S", timeinfo);
+
+            if(format == 0){
+                strcat(buffer, "_gaussian_filter.png");
+                stbi_write_png(buffer, source_width, source_height, 1, bit8_image_space, source_width * 1);
+            }
+            else if(format == 1){
+                strcat(buffer, "_gaussian_filter.jpg");
+                stbi_write_jpg(buffer, source_width, source_height, 1, bit8_image_space, source_width * 1);
             }
 
             printf("Image Processed : %s\n", buffer);
